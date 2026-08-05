@@ -173,7 +173,6 @@
       letter-spacing: 5px;
     }
 
-    /* 1페이지 카운트다운 화면 하단전용 @HinariPenyo 바 */
     .page1-bottom-bar {
       position: absolute;
       bottom: 1.5rem;
@@ -182,9 +181,9 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      background: rgba(255, 255, 255, 0.65);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.45);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border: 1.5px solid rgba(255, 255, 255, 0.85);
       padding: 0.4rem 1.4rem;
       border-radius: 25px;
@@ -196,7 +195,7 @@
 
     .page1-bottom-bar:hover {
       transform: translateX(-50%) scale(1.08);
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.7);
       box-shadow: 0 12px 25px rgba(219, 39, 119, 0.3);
     }
 
@@ -278,13 +277,15 @@
     .pink-container-box {
       width: 100%;
       height: 100%;
-      background: rgba(255, 182, 193, 0.35);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: 2px solid rgba(255, 255, 255, 0.7);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 192, 203, 0.2) 100%);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 2px solid rgba(255, 255, 255, 0.85);
       border-radius: 40px;
       padding: 1.5rem;
-      box-shadow: 0 25px 50px rgba(219, 39, 119, 0.22);
+      box-shadow: 
+        0 30px 60px rgba(219, 39, 119, 0.18),
+        inset 0 1px 2px rgba(255, 255, 255, 0.9);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -310,13 +311,20 @@
       height: 670px !important;
       max-height: 94% !important;
       border-radius: 24px;
-      background: rgba(255, 255, 255, 0.45);
-      border: 1.5px solid rgba(255, 255, 255, 0.8);
+      
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 240, 245, 0.3) 100%);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1.8px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 
+        0 20px 45px rgba(219, 39, 119, 0.15),
+        inset 0 1.5px 3px rgba(255, 255, 255, 1);
+      
       padding: 0.6rem 0.8rem 0.6rem 0.6rem;
       
       overflow-y: auto;
       overflow-x: hidden;
-      
+
       -webkit-font-smoothing: antialiased;
       backface-visibility: hidden;
       transform-style: preserve-3d;
@@ -326,11 +334,8 @@
         transform 0.6s cubic-bezier(0.25, 1, 0.5, 1),
         opacity 0.6s ease,
         filter 0.6s ease,
-        z-index 0.6s;
-    }
-
-    .carousel-card-item.tilting {
-      transition: transform 0.15s ease-out !important;
+        z-index 0.6s,
+        background 0.4s ease;
     }
 
     .carousel-card-item iframe,
@@ -340,6 +345,32 @@
       min-width: 100% !important;
       max-width: 100% !important;
       margin: 0 !important;
+      transition: mask-image 0.3s ease, -webkit-mask-image 0.3s ease;
+    }
+
+    .carousel-card-item.scrolled-top iframe,
+    .carousel-card-item.scrolled-top .twitter-tweet,
+    .carousel-card-item.scrolled-top .twitter-tweet-rendered {
+      -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 78%, rgba(0, 0, 0, 0) 100%);
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 78%, rgba(0, 0, 0, 0) 100%);
+    }
+
+    .carousel-card-item.scrolled-middle iframe,
+    .carousel-card-item.scrolled-middle .twitter-tweet,
+    .carousel-card-item.scrolled-middle .twitter-tweet-rendered {
+      -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 20%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0) 100%);
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 20%, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0) 100%);
+    }
+
+    .carousel-card-item.scrolled-bottom iframe,
+    .carousel-card-item.scrolled-bottom .twitter-tweet,
+    .carousel-card-item.scrolled-bottom .twitter-tweet-rendered {
+      -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 22%, rgba(0, 0, 0, 1) 100%);
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 22%, rgba(0, 0, 0, 1) 100%);
+    }
+
+    .carousel-card-item.tilting {
+      transition: transform 0.15s ease-out !important;
     }
 
     .carousel-card-item::-webkit-scrollbar { 
@@ -352,23 +383,41 @@
     }
 
     .carousel-card-item::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.3);
       border-radius: 10px;
       transition: background 0.3s ease;
     }
 
     .carousel-card-item:hover::-webkit-scrollbar-thumb {
-      background: rgba(255, 182, 193, 0.5);
+      background: rgba(255, 182, 193, 0.6);
     }
 
-    /* 포지션 상태 */
+    /* 
+       ★ 좌/우 카드에 클릭 오버레이 마스크를 씌워 외부 링크 이동을 막고, 
+          어느 부위를 클릭하더라도 100% 화살표처럼 중앙으로 회전하도록 완벽 구현 ★
+    */
     .carousel-card-item.pos-center {
       transform: translateX(0%) scale(1.05) translateZ(0px);
       opacity: 1;
       filter: none;
       z-index: 10;
-      box-shadow: 0 15px 35px rgba(219, 39, 119, 0.25);
-      border-color: rgba(255, 255, 255, 0.95);
+      box-shadow: 
+        0 25px 50px rgba(219, 39, 119, 0.22),
+        0 0 30px rgba(255, 255, 255, 0.6),
+        inset 0 2px 4px rgba(255, 255, 255, 1);
+      border-color: rgba(255, 255, 255, 0.98);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.68) 0%, rgba(255, 235, 242, 0.4) 100%);
+    }
+
+    .side-click-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 50;
+      cursor: pointer;
+      display: none;
     }
 
     .carousel-card-item.pos-left {
@@ -376,7 +425,15 @@
       opacity: 0.65;
       filter: none;
       z-index: 5;
-      pointer-events: none;
+    }
+
+    .carousel-card-item.pos-left .side-click-overlay {
+      display: block;
+    }
+
+    .carousel-card-item.pos-left:hover {
+      opacity: 0.88;
+      transform: translateX(-110%) scale(0.88) rotateY(6deg);
     }
 
     .carousel-card-item.pos-right {
@@ -384,7 +441,15 @@
       opacity: 0.65;
       filter: none;
       z-index: 5;
-      pointer-events: none;
+    }
+
+    .carousel-card-item.pos-right .side-click-overlay {
+      display: block;
+    }
+
+    .carousel-card-item.pos-right:hover {
+      opacity: 0.88;
+      transform: translateX(110%) scale(0.88) rotateY(-6deg);
     }
 
     /* =========================================
@@ -401,8 +466,9 @@
       display: flex;
       align-items: center;
       gap: 1rem;
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(12px);
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border: 1.5px solid rgba(255, 255, 255, 0.95);
       padding: 0.5rem 1.8rem;
       border-radius: 30px;
@@ -511,7 +577,6 @@
       <div class="timer-display" id="time-timer">00:00:00</div>
       <div class="day-sub-display" id="day-sub">Day-0</div>
 
-      <!-- 첫 카운트다운 화면 하단에 작게 보이는 @HinariPenyo 클릭 바 -->
       <div class="page1-bottom-bar" onclick="goToSection(1)" title="@HinariPenyo 게시물로 이동">
         <span class="page1-bottom-bar-text">@HinariPenyo</span>
         <span class="page1-bottom-bar-icon">↓</span>
@@ -540,21 +605,24 @@
           <div class="pink-container-box" id="tilt-container">
             <div class="carousel-track">
               <!-- 카드 1 -->
-              <div class="carousel-card-item pos-left" id="card-0">
+              <div class="carousel-card-item scrolled-top pos-left" id="card-0">
+                <div class="side-click-overlay" onclick="handleCardClick(0)"></div>
                 <blockquote class="twitter-tweet" data-theme="light" data-chrome="transparent">
                   <a href="https://twitter.com/HinariPenyo/status/2083387258468725047"></a>
                 </blockquote>
               </div>
 
               <!-- 카드 2 -->
-              <div class="carousel-card-item pos-center" id="card-1">
+              <div class="carousel-card-item scrolled-top pos-center" id="card-1">
+                <div class="side-click-overlay" onclick="handleCardClick(1)"></div>
                 <blockquote class="twitter-tweet" data-theme="light" data-chrome="transparent">
                   <a href="https://twitter.com/HinariPenyo/status/2084095226592067637"></a>
                 </blockquote>
               </div>
 
               <!-- 카드 3 -->
-              <div class="carousel-card-item pos-right" id="card-2">
+              <div class="carousel-card-item scrolled-top pos-right" id="card-2">
+                <div class="side-click-overlay" onclick="handleCardClick(2)"></div>
                 <blockquote class="twitter-tweet" data-theme="light" data-chrome="transparent">
                   <a href="https://twitter.com/HinariPenyo/status/2084817538178064536"></a>
                 </blockquote>
@@ -614,7 +682,7 @@
     }
 
     // -------------------------------------------------------------
-    // 3D 회전목마 캐러셀 순환 회전 알고리즘
+    // 3D 회전목마 캐러셀 순환 회전 알고리즘 & 카드 클릭 핸들러
     // -------------------------------------------------------------
     let currentPosMap = [0, 1, 2];
     const cards = [
@@ -631,8 +699,21 @@
         cardEl.classList.remove('tilting');
         
         const posIndex = currentPosMap[idx];
-        cardEl.className = 'carousel-card-item ' + positionClasses[posIndex];
+        const isTop = cardEl.scrollTop <= 5;
+        const isBottom = cardEl.scrollHeight - cardEl.scrollTop <= cardEl.clientHeight + 10;
+        
+        let scrollStateClass = 'scrolled-middle';
+        if (isTop && isBottom) {
+          scrollStateClass = '';
+        } else if (isTop) {
+          scrollStateClass = 'scrolled-top';
+        } else if (isBottom) {
+          scrollStateClass = 'scrolled-bottom';
+        }
+
+        cardEl.className = 'carousel-card-item ' + positionClasses[posIndex] + ' ' + scrollStateClass;
       });
+      checkCardsScrollState();
     }
 
     function rotateCarousel(direction) {
@@ -643,6 +724,48 @@
       }
       updateCarouselPositions();
     }
+
+    // 왼쪽/오른쪽 뒤로 빠진 카드를 클릭해도 트위터 외부링크로 새창이 뜨지 않고 화살표처럼 100% 중앙 회전!
+    function handleCardClick(cardIndex) {
+      const pos = currentPosMap[cardIndex];
+      if (pos === 0) {
+        rotateCarousel('prev');
+      } else if (pos === 2) {
+        rotateCarousel('next');
+      }
+    }
+
+    // -------------------------------------------------------------
+    // 스크롤 위치별 동적 상하 그라데이션 제어
+    // -------------------------------------------------------------
+    function checkCardsScrollState() {
+      cards.forEach(cardEl => {
+        const scrollTop = cardEl.scrollTop;
+        const scrollHeight = cardEl.scrollHeight;
+        const clientHeight = cardEl.clientHeight;
+
+        const isTop = scrollTop <= 5;
+        const isBottom = scrollHeight - scrollTop <= clientHeight + 10;
+
+        cardEl.classList.remove('scrolled-top', 'scrolled-middle', 'scrolled-bottom');
+
+        if (isTop && isBottom) {
+          // 스크롤 필요 없음
+        } else if (isTop) {
+          cardEl.classList.add('scrolled-top');
+        } else if (isBottom) {
+          cardEl.classList.add('scrolled-bottom');
+        } else {
+          cardEl.classList.add('scrolled-middle');
+        }
+      });
+    }
+
+    cards.forEach(cardEl => {
+      cardEl.addEventListener('scroll', checkCardsScrollState, { passive: true });
+    });
+
+    setTimeout(checkCardsScrollState, 1500);
 
     // -------------------------------------------------------------
     // 마우스 3D 틸트
