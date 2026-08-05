@@ -287,8 +287,9 @@
         z-index 0.6s;
     }
 
+    /* 틸트 트랜지션: 마우스 반응 시 스케일(Scale) 축은 고정하고 회전(rotate)만 실시간 적용 */
     .carousel-card-item.tilting {
-      transition: transform 0.45s cubic-bezier(0.1, 0.8, 0.3, 1) !important;
+      transition: transform 0.15s ease-out !important;
     }
 
     .carousel-card-item::-webkit-scrollbar { width: 4px; }
@@ -297,6 +298,7 @@
       border-radius: 2px;
     }
 
+    /* 포지션 상태 (scale을 1.04로 고정하여 틸트 시 크기 팽창/움찔거림 방지) */
     .carousel-card-item.pos-center {
       transform: translateX(0%) scale(1.04) translateZ(0px);
       opacity: 1;
@@ -404,7 +406,7 @@
 </head>
 <body>
 
-  <!-- 동적 배경 레이어 -->
+  <!-- 동적 패럴랙스 배경 레이어 -->
   <div class="bg-parallax-layer" id="bg-parallax"></div>
 
   <!-- 우측 상단 핫키 버튼 그룹 -->
@@ -574,7 +576,7 @@
     }
 
     // -------------------------------------------------------------
-    // 부드러운 스무스 마우스 틸트
+    // 크기 변동(확대/축소) 없이 '3D 기울기 틸트(rotate)'만 적용하는 고급 튜닝
     // -------------------------------------------------------------
     const tiltContainer = document.getElementById('tilt-container');
 
@@ -592,10 +594,11 @@
       const centerX = rect.width / 2;
       const centerY = rect.height / 2;
 
-      const rotateX = ((y - centerY) / centerY) * -8;
-      const rotateY = ((x - centerX) / centerX) * 8;
+      // 크기(scale)는 1.04로 딱 고정시키고, 마우스 위치에 따른 3D 기울임(rotateX, rotateY)만 적용!
+      const rotateX = ((y - centerY) / centerY) * -6;
+      const rotateY = ((x - centerX) / centerX) * 6;
 
-      centerCard.style.transform = `translateX(0%) scale(1.04) translateZ(10px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+      centerCard.style.transform = `translateX(0%) scale(1.04) translateZ(0px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
     });
 
     tiltContainer.addEventListener('mouseleave', () => {
