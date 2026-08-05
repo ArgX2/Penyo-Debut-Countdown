@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Countdown & X Updates</title>
+  <meta name="description" content="카운트다운 타이머와 X(구 트위터) 실시간 소식 확인 사이트">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+      --accent-color: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.35);
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', 'Noto Sans KR', sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, #38bdf8, #818cf8, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1000px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    @media (min-width: 768px) {
+      .container {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 2rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--accent-color);
+    }
+
+    /* Countdown Styling */
+    .countdown-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+      margin: 1.5rem 0;
+    }
+
+    .time-box {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 1rem 0.5rem;
+      text-align: center;
+    }
+
+    .time-value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #ffffff;
+      text-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    .time-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-top: 0.25rem;
+      letter-spacing: 1px;
+    }
+
+    .target-setter {
+      margin-top: auto;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .input-group {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    input[type="datetime-local"], input[type="text"] {
+      flex: 1;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      color: white;
+      font-family: inherit;
+      outline: none;
+    }
+
+    input[type="datetime-local"]:focus, input[type="text"]:focus {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    button {
+      background: linear-gradient(135deg, #38bdf8, #6366f1);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 0.75rem 1.25rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(56, 189, 248, 0.4);
+    }
+
+    /* X (Twitter) Feed Styling */
+    .x-feed-container {
+      flex: 1;
+      min-height: 400px;
+      max-height: 500px;
+      overflow-y: auto;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.4);
+      padding: 0.5rem;
+    }
+
+    .x-feed-container::-webkit-scrollbar {
+      width: 6px;
+    }
+    .x-feed-container::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+    }
+
+    footer {
+      margin-top: 3rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1 id="event-title">🎉 Special Event Countdown</h1>
+    <p class="subtitle">실시간 카운트다운 & 공식 X(트위터) 업데이트 소식</p>
+  </header>
+
+  <div class="container">
+    <!-- Countdown Section -->
+    <div class="card">
+      <div class="card-title">
+        <span>⏳</span> 카운트다운
+      </div>
+      
+      <div class="countdown-grid">
+        <div class="time-box">
+          <div class="time-value" id="days">00</div>
+          <div class="time-label">Days</div>
+        </div>
+        <div class="time-box">
+          <div class="time-value" id="hours">00</div>
+          <div class="time-label">Hours</div>
+        </div>
+        <div class="time-box">
+          <div class="time-value" id="minutes">00</div>
+          <div class="time-label">Mins</div>
+        </div>
+        <div class="time-box">
+          <div class="time-value" id="seconds">00</div>
+          <div class="time-label">Secs</div>
+        </div>
+      </div>
+
+      <div class="target-setter">
+        <label style="font-size: 0.85rem; color: var(--text-muted);">디데이/이벤트 시간 설정:</label>
+        <div class="input-group">
+          <input type="datetime-local" id="datetime-input">
+          <button id="set-target-btn">설정</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- X (Twitter) Feed Section -->
+    <div class="card">
+      <div class="card-title">
+        <span>𝕏</span> X (트위터) 실시간 소식
+      </div>
+
+      <div class="target-setter" style="margin-top: 0; margin-bottom: 1rem; border-top: none;">
+        <label style="font-size: 0.85rem; color: var(--text-muted);">X 계정 아이디 (예: OpenAI, NASA, X):</label>
+        <div class="input-group">
+          <input type="text" id="x-username-input" placeholder="계정 아이디입력 (예: OpenAI)" value="OpenAI">
+          <button id="set-x-btn">적용</button>
+        </div>
+      </div>
+
+      <div class="x-feed-container" id="x-feed">
+        <!-- X Embed Widget -->
+        <a class="twitter-timeline" data-theme="dark" href="https://twitter.com/OpenAI?ref_src=twsrc%5Etfw">Loading Tweets from @OpenAI...</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Powered by HTML/CSS & X Embedded Timeline</p>
+  </footer>
+
+  <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  <script>
+    // Countdown Timer Logic
+    let targetDate = new Date();
+    targetDate.setDate(targetDate.getDate() + 7); // Default: 7 days from now
+
+    const daysEl = document.getElementById('days');
+    const hoursEl = document.getElementById('hours');
+    const minutesEl = document.getElementById('minutes');
+    const secondsEl = document.getElementById('seconds');
+
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const distance = targetDate.getTime() - now;
+
+      if (distance < 0) {
+        daysEl.textContent = '00';
+        hoursEl.textContent = '00';
+        minutesEl.textContent = '00';
+        secondsEl.textContent = '00';
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      daysEl.textContent = String(days).padStart(2, '0');
+      hoursEl.textContent = String(hours).padStart(2, '0');
+      minutesEl.textContent = String(minutes).padStart(2, '0');
+      secondsEl.textContent = String(seconds).padStart(2, '0');
+    }
+
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    // Set Target Date
+    document.getElementById('set-target-btn').addEventListener('click', () => {
+      const inputVal = document.getElementById('datetime-input').value;
+      if (inputVal) {
+        targetDate = new Date(inputVal);
+        updateCountdown();
+      }
+    });
+
+    // Set X Account Feed Dynamic Logic
+    document.getElementById('set-x-btn').addEventListener('click', () => {
+      let username = document.getElementById('x-username-input').value.trim();
+      if (username.startsWith('@')) username = username.substring(1);
+
+      if (username) {
+        const feedContainer = document.getElementById('x-feed');
+        feedContainer.innerHTML = `<a class="twitter-timeline" data-theme="dark" href="https://twitter.com/${username}?ref_src=twsrc%5Etfw">Loading Tweets from @${username}...</a>`;
+        
+        // Re-load Twitter Widget JS
+        if (window.twttr && window.twttr.widgets) {
+          window.twttr.widgets.load(feedContainer);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
