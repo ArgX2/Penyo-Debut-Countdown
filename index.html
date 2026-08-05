@@ -262,10 +262,12 @@
       perspective: 1200px;
     }
 
+    /* 카드 래퍼 고정 */
     .carousel-card-item {
       position: absolute;
       width: 32%;
       max-width: 380px;
+      min-width: 320px; /* 트위터 위젯 최소 폭 강제 유지 */
       height: 92%;
       aspect-ratio: 3 / 5;
       border-radius: 24px;
@@ -287,7 +289,17 @@
         z-index 0.6s;
     }
 
-    /* 틸트 트랜지션: 마우스 반응 시 스케일(Scale) 축은 고정하고 회전(rotate)만 실시간 적용 */
+    /* 
+       ★ 트위터 8월 1일 자 게시물 iframe 크기 진동 버그 핵심 해결 ★
+       트위터 위젯 내부 iframe의 width/min-width를 100%로 강제 고정하여 
+       X 위젯 반응형 스크립트가 크기를 반복 갱신(Reflow Loop)하는 현상 원천 차단
+    */
+    .carousel-card-item iframe {
+      width: 100% !important;
+      min-width: 100% !important;
+      max-width: 100% !important;
+    }
+
     .carousel-card-item.tilting {
       transition: transform 0.15s ease-out !important;
     }
@@ -298,7 +310,7 @@
       border-radius: 2px;
     }
 
-    /* 포지션 상태 (scale을 1.04로 고정하여 틸트 시 크기 팽창/움찔거림 방지) */
+    /* 포지션 상태 */
     .carousel-card-item.pos-center {
       transform: translateX(0%) scale(1.04) translateZ(0px);
       opacity: 1;
@@ -576,7 +588,7 @@
     }
 
     // -------------------------------------------------------------
-    // 크기 변동(확대/축소) 없이 '3D 기울기 틸트(rotate)'만 적용하는 고급 튜닝
+    // 3D 기울임(Tilt) 지원 & 트위터 8/1 게시글 가로 폭 깜빡임(Reflow Loop) 완벽 고정
     // -------------------------------------------------------------
     const tiltContainer = document.getElementById('tilt-container');
 
@@ -594,7 +606,6 @@
       const centerX = rect.width / 2;
       const centerY = rect.height / 2;
 
-      // 크기(scale)는 1.04로 딱 고정시키고, 마우스 위치에 따른 3D 기울임(rotateX, rotateY)만 적용!
       const rotateX = ((y - centerY) / centerY) * -6;
       const rotateY = ((x - centerX) / centerX) * 6;
 
