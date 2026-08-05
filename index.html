@@ -3,20 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Event Countdown & X Updates</title>
-  <meta name="description" content="카운트다운 타이머와 X(구 트위터) 실시간 소식 확인 사이트">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Sans+KR:wght@300;400;700&display=swap" rel="stylesheet">
+  <title>Penyo Debut Countdown</title>
+  
   <style>
-    :root {
-      --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
-      --accent-color: #38bdf8;
-      --accent-glow: rgba(56, 189, 248, 0.35);
-      --card-bg: rgba(30, 41, 59, 0.7);
-      --card-border: rgba(255, 255, 255, 0.1);
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
+    /* 사용자 커스텀 폰트 적용 (font.ttf) */
+    @font-face {
+      font-family: 'CustomFont';
+      src: url('font.ttf') format('truetype');
+      font-weight: normal;
+      font-style: normal;
     }
 
     * {
@@ -25,302 +20,669 @@
       padding: 0;
     }
 
-    body {
-      font-family: 'Outfit', 'Noto Sans KR', sans-serif;
-      background: var(--bg-gradient);
-      color: var(--text-main);
-      min-height: 100vh;
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden; /* 스크롤 차단 */
+      font-family: 'CustomFont', sans-serif;
+    }
+
+    /* 동적 패럴랙스 배경 트랙 (위 ➔ 아래 스크롤 애니메이션) */
+    .bg-parallax-layer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-image: url('Bg.png');
+      background-size: cover;
+      background-position: top center;
+      background-repeat: no-repeat;
+      background-color: #fff5f8;
+      transition: background-position 0.9s cubic-bezier(0.65, 0, 0.35, 1);
+      z-index: 0;
+    }
+
+    .bg-parallax-layer.bottom-view {
+      background-position: bottom center;
+    }
+
+    /* 전체 수직 슬라이딩 트랙 컨테이너 */
+    .slider-track {
+      width: 100vw;
+      height: 200vh;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+      transform: translateY(0%);
+      z-index: 1;
+    }
+
+    /* 각 섹션 뷰 (100vh) */
+    .section-view {
+      width: 100vw;
+      height: 100vh;
       display: flex;
       flex-direction: column;
+      justify-content: center;
       align-items: center;
-      padding: 2rem 1rem;
+      position: relative;
     }
 
-    header {
-      text-align: center;
-      margin-bottom: 2.5rem;
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      font-weight: 800;
-      background: linear-gradient(90deg, #38bdf8, #818cf8, #c084fc);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 0.5rem;
-    }
-
-    p.subtitle {
-      color: var(--text-muted);
-      font-size: 1.1rem;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 1000px;
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 2rem;
-    }
-
-    @media (min-width: 768px) {
-      .container {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-
-    .card {
-      background: var(--card-bg);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--card-border);
-      border-radius: 24px;
-      padding: 2rem;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .card-title {
-      font-size: 1.4rem;
-      font-weight: 600;
-      margin-bottom: 1.5rem;
+    /* =========================================
+       우측 상단 핫키 버튼 그룹
+       ========================================= */
+    .hotkey-group {
+      position: fixed;
+      top: 1.8rem;
+      right: 2rem;
+      z-index: 110;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      color: var(--accent-color);
-    }
-
-    /* Countdown Styling */
-    .countdown-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
       gap: 0.75rem;
-      margin: 1.5rem 0;
     }
 
-    .time-box {
-      background: rgba(15, 23, 42, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 16px;
-      padding: 1rem 0.5rem;
+    .hotkey-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1.5px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 8px 20px rgba(219, 39, 119, 0.2);
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s;
+    }
+
+    .hotkey-btn:hover {
+      transform: scale(1.12);
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    .hotkey-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: #be185d;
+    }
+
+    .naver-cafe-icon {
+      font-family: sans-serif;
+      font-weight: 900;
+      font-size: 1.25rem;
+      color: #03c75a;
+    }
+
+    .youtube-icon-svg {
+      fill: #ff0000 !important;
+    }
+
+    /* =========================================
+       PAGE 1: 카운트다운 메인 뷰
+       ========================================= */
+    .target-title {
+      font-family: 'CustomFont', sans-serif;
+      font-size: clamp(1.6rem, 3.8vw, 2.8rem);
+      font-weight: normal;
+      color: #ffffff;
+      text-shadow: 
+        0 0 15px rgba(255, 255, 255, 1),
+        0 0 30px rgba(255, 182, 193, 1),
+        0 0 50px rgba(219, 39, 119, 0.95),
+        0 0 80px rgba(147, 51, 234, 0.8),
+        0 4px 10px rgba(0, 0, 0, 0.6);
+      margin-bottom: 0;
+      padding-bottom: 2.8rem;
+      text-align: center;
+      letter-spacing: 4px;
+    }
+
+    .timer-display {
+      font-family: 'CustomFont', sans-serif;
+      font-size: clamp(4.5rem, 16vw, 12.5rem);
+      font-weight: bold;
+      color: #ffffff;
+      text-shadow: 
+        0 0 30px rgba(255, 182, 193, 1),
+        0 0 60px rgba(219, 39, 119, 0.95),
+        0 0 100px rgba(147, 51, 234, 0.8),
+        0 8px 20px rgba(0, 0, 0, 0.5);
+      line-height: 1;
+      text-align: center;
+      letter-spacing: 12px;
+      margin-bottom: 1.5rem;
+      padding: 0 1rem;
+    }
+
+    .day-sub-display {
+      font-family: 'CustomFont', sans-serif;
+      font-size: clamp(1.5rem, 3.2vw, 2.4rem);
+      color: #ffffff;
+      text-shadow: 
+        0 0 15px rgba(255, 255, 255, 1),
+        0 0 30px rgba(255, 182, 193, 1),
+        0 0 50px rgba(219, 39, 119, 0.95),
+        0 0 80px rgba(147, 51, 234, 0.8),
+        0 4px 10px rgba(0, 0, 0, 0.6);
+      text-align: center;
+      letter-spacing: 5px;
+    }
+
+    /* =========================================
+       PAGE 2: 회전목마(3D Carousel) 뷰
+       ========================================= */
+    .x-section-wrapper {
+      width: 100%;
+      max-width: 1550px;
+      height: 88vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0.5rem 1rem 0 1rem;
+    }
+
+    .x-section-title {
+      font-family: 'CustomFont', sans-serif;
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      color: #ffffff;
+      text-shadow: 0 0 15px rgba(255, 105, 180, 0.8);
+      margin-bottom: 0.8rem;
       text-align: center;
     }
 
-    .time-value {
-      font-size: 2rem;
-      font-weight: 800;
-      color: #ffffff;
-      text-shadow: 0 0 12px var(--accent-glow);
-    }
-
-    .time-label {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      margin-top: 0.25rem;
-      letter-spacing: 1px;
-    }
-
-    .target-setter {
-      margin-top: auto;
-      padding-top: 1rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .input-group {
+    .box-outer-container {
+      width: 100%;
+      flex: 1;
       display: flex;
-      gap: 0.5rem;
-      margin-top: 0.5rem;
+      align-items: center;
+      position: relative;
+      padding: 0 5rem;
     }
 
-    input[type="datetime-local"], input[type="text"] {
-      flex: 1;
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 0.75rem 1rem;
-      color: white;
-      font-family: inherit;
-      outline: none;
-    }
-
-    input[type="datetime-local"]:focus, input[type="text"]:focus {
-      border-color: var(--accent-color);
-      box-shadow: 0 0 10px var(--accent-glow);
-    }
-
-    button {
-      background: linear-gradient(135deg, #38bdf8, #6366f1);
-      color: white;
+    .nav-arrow-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
       border: none;
-      border-radius: 12px;
-      padding: 0.75rem 1.25rem;
-      font-weight: 600;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(56, 189, 248, 0.4);
-    }
-
-    /* X (Twitter) Feed Styling */
-    .x-feed-container {
-      flex: 1;
-      min-height: 400px;
-      max-height: 500px;
-      overflow-y: auto;
-      border-radius: 16px;
-      background: rgba(15, 23, 42, 0.4);
+      z-index: 20;
+      filter: drop-shadow(0 0 12px rgba(255, 255, 255, 1)) drop-shadow(0 0 25px rgba(244, 114, 182, 0.9));
+      transition: all 0.3s ease;
       padding: 0.5rem;
     }
 
-    .x-feed-container::-webkit-scrollbar {
-      width: 6px;
-    }
-    .x-feed-container::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 3px;
+    .nav-arrow-btn.left { left: -0.5rem; }
+    .nav-arrow-btn.right { right: -0.5rem; }
+
+    .nav-arrow-btn svg {
+      width: 68px;
+      height: 68px;
+      fill: #ffffff;
     }
 
-    footer {
-      margin-top: 3rem;
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      text-align: center;
+    .nav-arrow-btn:hover {
+      transform: translateY(-50%) scale(1.2);
+      filter: drop-shadow(0 0 20px rgba(255, 255, 255, 1)) drop-shadow(0 0 35px rgba(236, 72, 153, 1));
+    }
+
+    .pink-container-box {
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 182, 193, 0.35);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 2px solid rgba(255, 255, 255, 0.7);
+      border-radius: 40px;
+      padding: 1.5rem;
+      box-shadow: 0 25px 50px rgba(219, 39, 119, 0.22);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .carousel-track {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 1200px;
+    }
+
+    .carousel-card-item {
+      position: absolute;
+      width: 32%;
+      max-width: 380px;
+      height: 92%;
+      aspect-ratio: 3 / 5;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.45);
+      border: 1.5px solid rgba(255, 255, 255, 0.8);
+      padding: 0.6rem;
+      overflow-y: auto;
+      overflow-x: hidden;
+      
+      -webkit-font-smoothing: antialiased;
+      backface-visibility: hidden;
+      transform-style: preserve-3d;
+      will-change: transform, opacity;
+      
+      transition: 
+        transform 0.6s cubic-bezier(0.25, 1, 0.5, 1),
+        opacity 0.6s ease,
+        filter 0.6s ease,
+        z-index 0.6s;
+    }
+
+    .carousel-card-item.tilting {
+      transition: transform 0.45s cubic-bezier(0.1, 0.8, 0.3, 1) !important;
+    }
+
+    .carousel-card-item::-webkit-scrollbar { width: 4px; }
+    .carousel-card-item::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 2px;
+    }
+
+    .carousel-card-item.pos-center {
+      transform: translateX(0%) scale(1.04) translateZ(0px);
+      opacity: 1;
+      filter: none;
+      z-index: 10;
+      box-shadow: 0 15px 35px rgba(219, 39, 119, 0.25);
+      border-color: rgba(255, 255, 255, 0.95);
+    }
+
+    .carousel-card-item.pos-left {
+      transform: translateX(-105%) scale(0.85) rotateY(10deg);
+      opacity: 0.65;
+      filter: none;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .carousel-card-item.pos-right {
+      transform: translateX(105%) scale(0.85) rotateY(-10deg);
+      opacity: 0.65;
+      filter: none;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    /* =========================================
+       2페이지 하단 미니 카운트다운 풋터
+       ========================================= */
+    .mini-sticky-countdown {
+      position: fixed;
+      bottom: 0.8rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(120px) scale(0.6);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 90;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1.5px solid rgba(255, 255, 255, 0.95);
+      padding: 0.5rem 1.8rem;
+      border-radius: 30px;
+      box-shadow: 0 10px 30px rgba(219, 39, 119, 0.25);
+      transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.6s ease;
+      cursor: pointer;
+    }
+
+    .mini-sticky-countdown.show {
+      transform: translateX(-50%) translateY(0) scale(1);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .mini-timer-text {
+      font-family: 'CustomFont', sans-serif;
+      font-size: 1.25rem;
+      font-weight: bold;
+      background: linear-gradient(135deg, #be185d, #9333ea);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .mini-day-text {
+      font-family: 'CustomFont', sans-serif;
+      font-size: 1.05rem;
+      color: #db2777;
+      font-weight: bold;
+      border-left: 1.5px solid rgba(236, 72, 153, 0.3);
+      padding-left: 0.8rem;
+    }
+
+    /* =========================================
+       오른쪽 네비게이션 점 (Dots Indicator)
+       ========================================= */
+    .dots-nav {
+      position: fixed;
+      right: 2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      z-index: 100;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.4);
+      border: 2px solid rgba(255, 255, 255, 0.8);
+      cursor: pointer;
+      transition: all 0.4s ease;
+    }
+
+    .dot.active {
+      background: #ffffff;
+      height: 28px;
+      border-radius: 10px;
+      box-shadow: 0 0 12px rgba(255, 182, 193, 1), 0 0 25px rgba(219, 39, 119, 0.8);
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1 id="event-title">🎉 Special Event Countdown</h1>
-    <p class="subtitle">실시간 카운트다운 & 공식 X(트위터) 업데이트 소식</p>
-  </header>
+  <!-- 동적 배경 레이어 -->
+  <div class="bg-parallax-layer" id="bg-parallax"></div>
 
-  <div class="container">
-    <!-- Countdown Section -->
-    <div class="card">
-      <div class="card-title">
-        <span>⏳</span> 카운트다운
-      </div>
-      
-      <div class="countdown-grid">
-        <div class="time-box">
-          <div class="time-value" id="days">00</div>
-          <div class="time-label">Days</div>
-        </div>
-        <div class="time-box">
-          <div class="time-value" id="hours">00</div>
-          <div class="time-label">Hours</div>
-        </div>
-        <div class="time-box">
-          <div class="time-value" id="minutes">00</div>
-          <div class="time-label">Mins</div>
-        </div>
-        <div class="time-box">
-          <div class="time-value" id="seconds">00</div>
-          <div class="time-label">Secs</div>
-        </div>
-      </div>
-
-      <div class="target-setter">
-        <label style="font-size: 0.85rem; color: var(--text-muted);">디데이/이벤트 시간 설정:</label>
-        <div class="input-group">
-          <input type="datetime-local" id="datetime-input">
-          <button id="set-target-btn">설정</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- X (Twitter) Feed Section -->
-    <div class="card">
-      <div class="card-title">
-        <span>𝕏</span> X (트위터) 실시간 소식
-      </div>
-
-      <div class="target-setter" style="margin-top: 0; margin-bottom: 1rem; border-top: none;">
-        <label style="font-size: 0.85rem; color: var(--text-muted);">X 계정 아이디 (예: OpenAI, NASA, X):</label>
-        <div class="input-group">
-          <input type="text" id="x-username-input" placeholder="계정 아이디입력 (예: OpenAI)" value="OpenAI">
-          <button id="set-x-btn">적용</button>
-        </div>
-      </div>
-
-      <div class="x-feed-container" id="x-feed">
-        <!-- X Embed Widget -->
-        <a class="twitter-timeline" data-theme="dark" href="https://twitter.com/OpenAI?ref_src=twsrc%5Etfw">Loading Tweets from @OpenAI...</a>
-      </div>
-    </div>
+  <!-- 우측 상단 핫키 버튼 그룹 -->
+  <div class="hotkey-group">
+    <a href="https://cafe.naver.com/penyo" target="_blank" class="hotkey-btn" title="히나리 페뇨 공식 네이버 카페">
+      <span class="naver-cafe-icon">N</span>
+    </a>
+    <a href="https://www.youtube.com/@HinariPenyo" target="_blank" class="hotkey-btn" title="히나리 페뇨 공식 유튜브 채널">
+      <svg viewBox="0 0 24 24" class="youtube-icon-svg">
+        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+      </svg>
+    </a>
+    <a href="https://x.com/HinariPenyo" target="_blank" class="hotkey-btn" title="히나리 페뇨 공식 X(트위터)">
+      <svg viewBox="0 0 24 24">
+        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+      </svg>
+    </a>
   </div>
 
-  <footer>
-    <p>Powered by HTML/CSS & X Embedded Timeline</p>
-  </footer>
+  <!-- 오른쪽 2개 인디케이터 점 -->
+  <div class="dots-nav">
+    <div class="dot active" onclick="goToSection(0)" title="카운트다운"></div>
+    <div class="dot" onclick="goToSection(1)" title="@HinariPenyo 게시물"></div>
+  </div>
 
+  <!-- 2페이지 전용 하단 미니 스티키 카운트다운 -->
+  <div class="mini-sticky-countdown" id="mini-countdown" onclick="goToSection(0)" title="카운트다운으로 돌아가기">
+    <span style="color: #be185d; font-size: 0.9rem;">⏳</span>
+    <span class="mini-timer-text" id="mini-time">00:00:00</span>
+    <span class="mini-day-text" id="mini-day">Day-0</span>
+  </div>
+
+  <!-- 전체 수직 슬라이딩 트랙 -->
+  <div class="slider-track" id="slider-track">
+    
+    <!-- PAGE 1: 카운트다운 -->
+    <section class="section-view" id="sec-0">
+      <h1 class="target-title">雛莉ぺにょ(히나리 페뇨)의 첫방송까지</h1>
+      <div class="timer-display" id="time-timer">00:00:00</div>
+      <div class="day-sub-display" id="day-sub">Day-0</div>
+    </section>
+
+    <!-- PAGE 2: 3D 회전목마 -->
+    <section class="section-view" id="sec-1">
+      <div class="x-section-wrapper">
+        <h2 class="x-section-title">@HinariPenyo</h2>
+        
+        <div class="box-outer-container">
+          
+          <button class="nav-arrow-btn left" onclick="rotateCarousel('prev')" title="이전 게시글">
+            <svg viewBox="0 0 24 24">
+              <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+            </svg>
+          </button>
+
+          <button class="nav-arrow-btn right" onclick="rotateCarousel('next')" title="다음 게시글">
+            <svg viewBox="0 0 24 24">
+              <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+            </svg>
+          </button>
+
+          <div class="pink-container-box" id="tilt-container">
+            <div class="carousel-track">
+              <!-- 카드 1 -->
+              <div class="carousel-card-item pos-left" id="card-0">
+                <blockquote class="twitter-tweet" data-theme="light" data-chrome="transparent">
+                  <a href="https://twitter.com/HinariPenyo/status/2083387258468725047"></a>
+                </blockquote>
+              </div>
+
+              <!-- 카드 2 -->
+              <div class="carousel-card-item pos-center" id="card-1">
+                <blockquote class="twitter-tweet" data-theme="light" data-chrome="transparent">
+                  <a href="https://twitter.com/HinariPenyo/status/2084095226592067637"></a>
+                </blockquote>
+              </div>
+
+              <!-- 카드 3 -->
+              <div class="carousel-card-item pos-right" id="card-2">
+                <blockquote class="twitter-tweet" data-theme="light" data-chrome="transparent">
+                  <a href="https://twitter.com/HinariPenyo/status/2084817538178064536"></a>
+                </blockquote>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+
+  <!-- X Embed Script -->
   <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+  
   <script>
-    // Countdown Timer Logic
-    let targetDate = new Date();
-    targetDate.setDate(targetDate.getDate() + 7); // Default: 7 days from now
+    // -------------------------------------------------------------
+    // 수직 슬라이딩 & 배경 패럴랙스
+    // -------------------------------------------------------------
+    let currentSection = 0;
+    let isTransitioning = false;
 
-    const daysEl = document.getElementById('days');
-    const hoursEl = document.getElementById('hours');
-    const minutesEl = document.getElementById('minutes');
-    const secondsEl = document.getElementById('seconds');
+    const sliderTrack = document.getElementById('slider-track');
+    const dots = document.querySelectorAll('.dot');
+    const miniCountdown = document.getElementById('mini-countdown');
+    const bgParallax = document.getElementById('bg-parallax');
 
-    function updateCountdown() {
-      const now = new Date().getTime();
-      const distance = targetDate.getTime() - now;
+    function goToSection(index) {
+      if (index < 0 || index > 1 || isTransitioning) return;
 
-      if (distance < 0) {
-        daysEl.textContent = '00';
-        hoursEl.textContent = '00';
-        minutesEl.textContent = '00';
-        secondsEl.textContent = '00';
+      isTransitioning = true;
+      currentSection = index;
+
+      sliderTrack.style.transform = `translateY(-${index * 50}%)`;
+
+      if (index === 1) {
+        bgParallax.classList.add('bottom-view');
+        miniCountdown.classList.add('show');
+      } else {
+        bgParallax.classList.remove('bottom-view');
+        miniCountdown.classList.remove('show');
+      }
+
+      dots.forEach((dot, idx) => {
+        if (idx === index) {
+          dot.classList.add('active');
+        } else {
+          dot.classList.remove('active');
+        }
+      });
+
+      setTimeout(() => {
+        isTransitioning = false;
+      }, 850);
+    }
+
+    // -------------------------------------------------------------
+    // 3D 회전목마 캐러셀 순환 회전 알고리즘
+    // -------------------------------------------------------------
+    let currentPosMap = [0, 1, 2];
+    const cards = [
+      document.getElementById('card-0'),
+      document.getElementById('card-1'),
+      document.getElementById('card-2')
+    ];
+
+    const positionClasses = ['pos-left', 'pos-center', 'pos-right'];
+
+    function updateCarouselPositions() {
+      cards.forEach((cardEl, idx) => {
+        cardEl.style.transform = '';
+        cardEl.classList.remove('tilting');
+        
+        const posIndex = currentPosMap[idx];
+        cardEl.className = 'carousel-card-item ' + positionClasses[posIndex];
+      });
+    }
+
+    function rotateCarousel(direction) {
+      if (direction === 'next') {
+        currentPosMap = currentPosMap.map(pos => (pos + 2) % 3);
+      } else {
+        currentPosMap = currentPosMap.map(pos => (pos + 1) % 3);
+      }
+      updateCarouselPositions();
+    }
+
+    // -------------------------------------------------------------
+    // 부드러운 스무스 마우스 틸트
+    // -------------------------------------------------------------
+    const tiltContainer = document.getElementById('tilt-container');
+
+    tiltContainer.addEventListener('mousemove', (e) => {
+      const centerIdx = currentPosMap.indexOf(1);
+      if (centerIdx === -1) return;
+
+      const centerCard = cards[centerIdx];
+      centerCard.classList.add('tilting');
+
+      const rect = tiltContainer.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+
+      const rotateX = ((y - centerY) / centerY) * -8;
+      const rotateY = ((x - centerX) / centerX) * 8;
+
+      centerCard.style.transform = `translateX(0%) scale(1.04) translateZ(10px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    });
+
+    tiltContainer.addEventListener('mouseleave', () => {
+      const centerIdx = currentPosMap.indexOf(1);
+      if (centerIdx !== -1) {
+        const centerCard = cards[centerIdx];
+        centerCard.classList.add('tilting');
+        centerCard.style.transform = `translateX(0%) scale(1.04) translateZ(0px) rotateX(0deg) rotateY(0deg)`;
+        
+        setTimeout(() => {
+          centerCard.classList.remove('tilting');
+        }, 450);
+      }
+    });
+
+    // -------------------------------------------------------------
+    // 마우스 휠 및 터치 제스처
+    // -------------------------------------------------------------
+    window.addEventListener('wheel', (e) => {
+      if (e.deltaY > 20) {
+        goToSection(1);
+      } else if (e.deltaY < -20) {
+        goToSection(0);
+      }
+    }, { passive: true });
+
+    let touchStartY = 0;
+    window.addEventListener('touchstart', (e) => {
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    window.addEventListener('touchend', (e) => {
+      const touchEndY = e.changedTouches[0].clientY;
+      const diffY = touchStartY - touchEndY;
+
+      if (diffY > 50) {
+        goToSection(1);
+      } else if (diffY < -50) {
+        goToSection(0);
+      }
+    }, { passive: true });
+
+    // -------------------------------------------------------------
+    // 카운트다운 타이머 로직
+    // -------------------------------------------------------------
+    const targetDate = new Date(2026, 7, 8, 20, 0, 0); // 8월 8일 20시
+    
+    const timeTimerEl = document.getElementById('time-timer');
+    const daySubEl = document.getElementById('day-sub');
+    const miniTimeEl = document.getElementById('mini-time');
+    const miniDayEl = document.getElementById('mini-day');
+
+    function updateTimer() {
+      const currentTime = new Date().getTime();
+      const difference = targetDate.getTime() - currentTime;
+
+      if (difference <= 0) {
+        timeTimerEl.textContent = '00:00:00';
+        daySubEl.textContent = 'Day-0';
+        miniTimeEl.textContent = '00:00:00';
+        miniDayEl.textContent = 'Day-0';
         return;
       }
 
-      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      const rawDays = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
 
-      daysEl.textContent = String(days).padStart(2, '0');
-      hoursEl.textContent = String(hours).padStart(2, '0');
-      minutesEl.textContent = String(minutes).padStart(2, '0');
-      secondsEl.textContent = String(seconds).padStart(2, '0');
+      const totalHours = (rawDays * 24) + hours;
+
+      const totalHStr = String(totalHours).padStart(2, '0');
+      const mStr = String(minutes).padStart(2, '0');
+      const sStr = String(seconds).padStart(2, '0');
+
+      const timeFormatted = `${totalHStr}:${mStr}:${sStr}`;
+      const dayFormatted = `Day-${rawDays}`;
+
+      timeTimerEl.textContent = timeFormatted;
+      daySubEl.textContent = dayFormatted;
+
+      miniTimeEl.textContent = timeFormatted;
+      miniDayEl.textContent = dayFormatted;
     }
 
-    setInterval(updateCountdown, 1000);
-    updateCountdown();
-
-    // Set Target Date
-    document.getElementById('set-target-btn').addEventListener('click', () => {
-      const inputVal = document.getElementById('datetime-input').value;
-      if (inputVal) {
-        targetDate = new Date(inputVal);
-        updateCountdown();
-      }
-    });
-
-    // Set X Account Feed Dynamic Logic
-    document.getElementById('set-x-btn').addEventListener('click', () => {
-      let username = document.getElementById('x-username-input').value.trim();
-      if (username.startsWith('@')) username = username.substring(1);
-
-      if (username) {
-        const feedContainer = document.getElementById('x-feed');
-        feedContainer.innerHTML = `<a class="twitter-timeline" data-theme="dark" href="https://twitter.com/${username}?ref_src=twsrc%5Etfw">Loading Tweets from @${username}...</a>`;
-        
-        // Re-load Twitter Widget JS
-        if (window.twttr && window.twttr.widgets) {
-          window.twttr.widgets.load(feedContainer);
-        }
-      }
-    });
+    setInterval(updateTimer, 1000);
+    updateTimer();
   </script>
 </body>
 </html>
