@@ -173,6 +173,46 @@
       letter-spacing: 5px;
     }
 
+    /* 1페이지 카운트다운 화면 하단전용 @HinariPenyo 바 */
+    .page1-bottom-bar {
+      position: absolute;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1.5px solid rgba(255, 255, 255, 0.85);
+      padding: 0.4rem 1.4rem;
+      border-radius: 25px;
+      box-shadow: 0 8px 20px rgba(219, 39, 119, 0.18);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .page1-bottom-bar:hover {
+      transform: translateX(-50%) scale(1.08);
+      background: rgba(255, 255, 255, 0.85);
+      box-shadow: 0 12px 25px rgba(219, 39, 119, 0.3);
+    }
+
+    .page1-bottom-bar-text {
+      font-family: 'CustomFont', sans-serif;
+      font-size: clamp(1rem, 1.8vw, 1.25rem);
+      font-weight: bold;
+      color: #be185d;
+      letter-spacing: 1px;
+    }
+
+    .page1-bottom-bar-icon {
+      font-size: 0.9rem;
+      color: #db2777;
+    }
+
     /* =========================================
        PAGE 2: 회전목마(3D Carousel) 뷰
        ========================================= */
@@ -302,7 +342,6 @@
       margin: 0 !important;
     }
 
-    /* 초슬림 & 극도의 초투명 스크롤바 디자인 */
     .carousel-card-item::-webkit-scrollbar { 
       width: 4px;
     }
@@ -313,13 +352,13 @@
     }
 
     .carousel-card-item::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.25); /* 평소에는 극도로 투명하게 은폐 */
+      background: rgba(255, 255, 255, 0.25);
       border-radius: 10px;
       transition: background 0.3s ease;
     }
 
     .carousel-card-item:hover::-webkit-scrollbar-thumb {
-      background: rgba(255, 182, 193, 0.5); /* 마우스 올렸을 때만 약하게 표출 */
+      background: rgba(255, 182, 193, 0.5);
     }
 
     /* 포지션 상태 */
@@ -471,6 +510,12 @@
       <h1 class="target-title">雛莉ぺにょ(히나리 페뇨)의 첫방송까지</h1>
       <div class="timer-display" id="time-timer">00:00:00</div>
       <div class="day-sub-display" id="day-sub">Day-0</div>
+
+      <!-- 첫 카운트다운 화면 하단에 작게 보이는 @HinariPenyo 클릭 바 -->
+      <div class="page1-bottom-bar" onclick="goToSection(1)" title="@HinariPenyo 게시물로 이동">
+        <span class="page1-bottom-bar-text">@HinariPenyo</span>
+        <span class="page1-bottom-bar-icon">↓</span>
+      </div>
     </section>
 
     <!-- PAGE 2: 3D 회전목마 -->
