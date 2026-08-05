@@ -262,14 +262,13 @@
       perspective: 1200px;
     }
 
-    /* 카드 래퍼 고정 */
+    /* 카드 래퍼 고정 (픽셀 px 폭 절대 고정으로 트위터 반응형 리플로우 차단) */
     .carousel-card-item {
       position: absolute;
-      width: 32%;
-      max-width: 380px;
-      min-width: 320px; /* 트위터 위젯 최소 폭 강제 유지 */
+      width: 380px !important;
+      min-width: 380px !important;
+      max-width: 380px !important;
       height: 92%;
-      aspect-ratio: 3 / 5;
       border-radius: 24px;
       background: rgba(255, 255, 255, 0.45);
       border: 1.5px solid rgba(255, 255, 255, 0.8);
@@ -289,17 +288,6 @@
         z-index 0.6s;
     }
 
-    /* 
-       ★ 트위터 8월 1일 자 게시물 iframe 크기 진동 버그 핵심 해결 ★
-       트위터 위젯 내부 iframe의 width/min-width를 100%로 강제 고정하여 
-       X 위젯 반응형 스크립트가 크기를 반복 갱신(Reflow Loop)하는 현상 원천 차단
-    */
-    .carousel-card-item iframe {
-      width: 100% !important;
-      min-width: 100% !important;
-      max-width: 100% !important;
-    }
-
     .carousel-card-item.tilting {
       transition: transform 0.15s ease-out !important;
     }
@@ -310,9 +298,9 @@
       border-radius: 2px;
     }
 
-    /* 포지션 상태 */
+    /* 포지션 상태 (3D 회전 각도 튜닝 및 380px 픽셀 완전 고정) */
     .carousel-card-item.pos-center {
-      transform: translateX(0%) scale(1.04) translateZ(0px);
+      transform: translateX(0%) scale(1.05) translateZ(0px);
       opacity: 1;
       filter: none;
       z-index: 10;
@@ -321,7 +309,7 @@
     }
 
     .carousel-card-item.pos-left {
-      transform: translateX(-105%) scale(0.85) rotateY(10deg);
+      transform: translateX(-110%) scale(0.85) rotateY(12deg);
       opacity: 0.65;
       filter: none;
       z-index: 5;
@@ -329,7 +317,7 @@
     }
 
     .carousel-card-item.pos-right {
-      transform: translateX(105%) scale(0.85) rotateY(-10deg);
+      transform: translateX(110%) scale(0.85) rotateY(-12deg);
       opacity: 0.65;
       filter: none;
       z-index: 5;
@@ -588,7 +576,7 @@
     }
 
     // -------------------------------------------------------------
-    // 3D 기울임(Tilt) 지원 & 트위터 8/1 게시글 가로 폭 깜빡임(Reflow Loop) 완벽 고정
+    // 3D 마우스 틸트 (절대 픽셀 폭 380px 고정으로 트위터 위젯 가로 요동 원천 차단)
     // -------------------------------------------------------------
     const tiltContainer = document.getElementById('tilt-container');
 
@@ -609,7 +597,7 @@
       const rotateX = ((y - centerY) / centerY) * -6;
       const rotateY = ((x - centerX) / centerX) * 6;
 
-      centerCard.style.transform = `translateX(0%) scale(1.04) translateZ(0px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+      centerCard.style.transform = `translateX(0%) scale(1.05) translateZ(0px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
     });
 
     tiltContainer.addEventListener('mouseleave', () => {
@@ -617,7 +605,7 @@
       if (centerIdx !== -1) {
         const centerCard = cards[centerIdx];
         centerCard.classList.add('tilting');
-        centerCard.style.transform = `translateX(0%) scale(1.04) translateZ(0px) rotateX(0deg) rotateY(0deg)`;
+        centerCard.style.transform = `translateX(0%) scale(1.05) translateZ(0px) rotateX(0deg) rotateY(0deg)`;
         
         setTimeout(() => {
           centerCard.classList.remove('tilting');
