@@ -305,11 +305,6 @@
       perspective: 1200px;
     }
 
-    /* 
-       ★ 모바일 반응형 카드 3D 회전목마 파라미터 ★
-       - PC: 380px 넓은 폭 유지
-       - 모바일: 화면 너비에 맞게 88vw (최대 380px) 동적 스케일링
-    */
     .carousel-card-item {
       position: absolute;
       width: min(380px, 86vw) !important;
@@ -399,9 +394,6 @@
       background: rgba(255, 182, 193, 0.6);
     }
 
-    /* 
-       ★ 반응형 포지션 스타일 (모바일에서는 화면이 좁으므로 좌/우 이동 오프셋을 % 로 조율) ★
-    */
     .carousel-card-item.pos-center {
       transform: translateX(0%) scale(1.05) translateZ(0px);
       opacity: 1;
@@ -448,7 +440,6 @@
       display: block;
     }
 
-    /* 데스크톱 모니터 반응형 오버라이드 (화면 너비 768px 이상일 때 기존 오프셋 110% 유지) */
     @media (min-width: 768px) {
       .carousel-card-item.pos-left {
         transform: translateX(-110%) scale(0.85) rotateY(12deg);
@@ -749,7 +740,7 @@
     }
 
     // -------------------------------------------------------------
-    // 모바일 터치 스와이프 제스처 (좌/우 스와이프로 3D 회전목마 넘기기 지원)
+    // 모바일 터치 스와이프 제스처
     // -------------------------------------------------------------
     let touchStartX = 0;
     let touchStartY = 0;
@@ -768,12 +759,11 @@
       const diffX = touchStartX - touchEndX;
       const diffY = touchStartY - touchEndY;
 
-      // 수평 좌우 스와이프가 수직 스크롤보다 클 때 3D 카드 넘기기 작동
       if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 35) {
         if (diffX > 0) {
-          rotateCarousel('next'); // 왼쪽으로 훔치면 다음 카드
+          rotateCarousel('next');
         } else {
-          rotateCarousel('prev'); // 오른쪽으로 훔치면 이전 카드
+          rotateCarousel('prev');
         }
       }
     }, { passive: true });
@@ -814,7 +804,6 @@
     // 마우스 3D 틸트 (데스크톱 전용)
     // -------------------------------------------------------------
     tiltContainer.addEventListener('mousemove', (e) => {
-      // 모바일 등 손가락 터치 기기에서는 틸트 제외
       if (window.innerWidth < 768) return;
 
       const centerIdx = currentPosMap.indexOf(1);
@@ -866,7 +855,6 @@
     }, { passive: true });
 
     window.addEventListener('touchend', (e) => {
-      // 2페이지 3D 회전목마 영역 내부에서 좌우 터치 중일 때는 상하 페이지 전환 방지
       const windowTouchEndY = e.changedTouches[0].clientY;
       const diffY = windowTouchStartY - windowTouchEndY;
 
@@ -878,9 +866,9 @@
     }, { passive: true });
 
     // -------------------------------------------------------------
-    // 카운트다운 타이머 로직
+    // 카운트다운 타이머 로직 (Day-N 기준: 캘린더 '자정 00시' 날짜 차이 기준)
     // -------------------------------------------------------------
-    const targetDate = new Date(2026, 7, 8, 20, 0, 0); // 8월 8일 20시
+    const targetDate = new Date(2026, 7, 8, 20, 0, 0); // 2026년 8월 8일 20시 (목표 방송일)
     
     const timeTimerEl = document.getElementById('time-timer');
     const daySubEl = document.getElementById('day-sub');
@@ -888,10 +876,19 @@
     const miniDayEl = document.getElementById('mini-day');
 
     function updateTimer() {
-      const currentTime = new Date().getTime();
-      const difference = targetDate.getTime() - currentTime;
+      const now = new Date();
 
-      if (difference <= 0) {
+      // 자정 00:00:00 기준 날짜 차이 계산 (8월 8일 - 오늘 날짜)
+      const targetMidnight = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
+      const nowMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+      const msDiff = targetMidnight.getTime() - nowMidnight.getTime();
+      const calendarDaysDiff = Math.round(msDiff / (1000 * 60 * 60 * 24));
+
+      // 정확한 남은 시간 (초 단위)
+      const exactMsDiff = targetDate.getTime() - now.getTime();
+
+      if (exactMsDiff <= 0) {
         timeTimerEl.textContent = '00:00:00';
         daySubEl.textContent = 'Day-0';
         miniTimeEl.textContent = '00:00:00';
@@ -899,19 +896,19 @@
         return;
       }
 
-      const rawDays = Math.floor(difference / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-
-      const totalHours = (rawDays * 24) + hours;
+      // 누적 총 시간 (Hours)
+      const totalHours = Math.floor(exactMsDiff / (1000 * 60 * 60));
+      const minutes = Math.floor((exactMsDiff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((exactMsDiff % (1000 * 60)) / 1000);
 
       const totalHStr = String(totalHours).padStart(2, '0');
       const mStr = String(minutes).padStart(2, '0');
       const sStr = String(seconds).padStart(2, '0');
 
       const timeFormatted = `${totalHStr}:${mStr}:${sStr}`;
-      const dayFormatted = `Day-${rawDays}`;
+      
+      // 8월 6일 기준 Day-2 (자정 넘어가서 8월 7일이 되면 자동으로 Day-1)
+      const dayFormatted = `Day-${calendarDaysDiff}`;
 
       timeTimerEl.textContent = timeFormatted;
       daySubEl.textContent = dayFormatted;
