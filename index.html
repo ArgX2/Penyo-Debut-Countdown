@@ -71,7 +71,7 @@
     }
 
     /* =========================================
-       우측 상단 핫키 버튼 그룹 (모바일 반응형 대응)
+       우측 상단 핫키 버튼 그룹 (치지직 아이콘 포함)
        ========================================= */
     .hotkey-group {
       position: fixed;
@@ -118,12 +118,18 @@
       color: #03c75a;
     }
 
+    .chzzk-icon-svg {
+      width: 22px !important;
+      height: 22px !important;
+      fill: #00ffa3 !important;
+    }
+
     .youtube-icon-svg {
       fill: #ff0000 !important;
     }
 
     /* =========================================
-       PAGE 1: 카운트다운 메인 뷰 (모바일 반응형 대응)
+       PAGE 1: 카운트다운 메인 뷰
        ========================================= */
     .target-title {
       font-family: 'CustomFont', sans-serif;
@@ -142,6 +148,31 @@
       letter-spacing: 3px;
       padding-left: 0.5rem;
       padding-right: 0.5rem;
+    }
+
+    /* 타이머 wrapper 영역 (페이드 전환용) */
+    .timer-container-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 220px;
+    }
+
+    .timer-box-fade {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), visibility 1.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .timer-box-fade.hidden-fade {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
     }
 
     .timer-display {
@@ -173,6 +204,102 @@
         0 4px 10px rgba(0, 0, 0, 0.6);
       text-align: center;
       letter-spacing: 4px;
+    }
+
+    /* 
+       ★ 방송 시작 후 카운트다운 자리를 대체할 치지직 스트리밍 입장 버튼 ★
+    */
+    .chzzk-live-enter-btn {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.85);
+      opacity: 0;
+      visibility: hidden;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: linear-gradient(135deg, rgba(0, 255, 163, 0.25) 0%, rgba(255, 255, 255, 0.8) 100%);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 2px solid rgba(0, 255, 163, 0.9);
+      padding: 1.2rem 2.8rem;
+      border-radius: 50px;
+      box-shadow: 
+        0 0 30px rgba(0, 255, 163, 0.6),
+        0 15px 40px rgba(219, 39, 119, 0.3),
+        inset 0 2px 4px rgba(255, 255, 255, 1);
+      cursor: pointer;
+      text-decoration: none;
+      transition: 
+        opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1),
+        visibility 1.2s ease,
+        transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+        box-shadow 0.3s ease;
+      white-space: nowrap;
+      z-index: 40;
+    }
+
+    .chzzk-live-enter-btn.show-fade {
+      opacity: 1;
+      visibility: visible;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .chzzk-live-enter-btn:hover {
+      transform: translate(-50%, -50%) scale(1.08);
+      background: linear-gradient(135deg, rgba(0, 255, 163, 0.4) 0%, rgba(255, 255, 255, 0.95) 100%);
+      box-shadow: 
+        0 0 50px rgba(0, 255, 163, 0.9),
+        0 20px 50px rgba(219, 39, 119, 0.4),
+        inset 0 2px 4px rgba(255, 255, 255, 1);
+    }
+
+    .chzzk-btn-icon {
+      width: clamp(32px, 5vw, 44px);
+      height: clamp(32px, 5vw, 44px);
+      fill: #00ffa3;
+      filter: drop-shadow(0 0 10px rgba(0, 255, 163, 0.8));
+    }
+
+    .chzzk-btn-text-group {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .chzzk-btn-main-text {
+      font-family: 'CustomFont', sans-serif;
+      font-size: clamp(1.4rem, 4vw, 2.2rem);
+      font-weight: bold;
+      color: #0f172a;
+      letter-spacing: 2px;
+      line-height: 1.1;
+    }
+
+    .chzzk-btn-sub-text {
+      font-family: 'CustomFont', sans-serif;
+      font-size: clamp(0.95rem, 2.2vw, 1.25rem);
+      color: #059669;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    /* 라이브 깜빡임 빨간 점 바운스 효과 */
+    .live-dot-pulse {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #ff0055;
+      box-shadow: 0 0 12px #ff0055;
+      animation: livePulse 1.2s infinite alternate;
+      display: inline-block;
+      margin-right: 0.4rem;
+    }
+
+    @keyframes livePulse {
+      0% { transform: scale(0.8); opacity: 0.6; }
+      100% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 20px #ff0055; }
     }
 
     .page1-bottom-bar {
@@ -418,7 +545,6 @@
       display: none;
     }
 
-    /* 포지션 상태 (pos-hidden 상태 추가로 N개 트윗 호환성 확장) */
     .carousel-card-item.pos-hidden {
       transform: translateX(0%) scale(0.5) translateZ(-200px);
       opacity: 0;
@@ -552,10 +678,15 @@
   <!-- 동적 패럴랙스 배경 레이어 -->
   <div class="bg-parallax-layer" id="bg-parallax"></div>
 
-  <!-- 우측 상단 핫키 버튼 그룹 -->
+  <!-- 우측 상단 핫키 버튼 그룹 (네이버 카페, 치지직, 유튜브, X) -->
   <div class="hotkey-group">
     <a href="https://cafe.naver.com/penyo" target="_blank" class="hotkey-btn" title="히나리 페뇨 공식 네이버 카페">
       <span class="naver-cafe-icon">N</span>
+    </a>
+    <a href="https://chzzk.naver.com/f2607c885c65b6776b9cf5bfb473753c" target="_blank" class="hotkey-btn" title="히나리 페뇨 공식 치지직 방송국">
+      <svg viewBox="0 0 24 24" class="chzzk-icon-svg">
+        <path d="M4 3h16a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm3.5 4v10h3V13h2.5l2.5 4h3.5l-3.3-5.2A4 4 0 0 0 18 8.5C18 7.1 16.9 7 15.5 7H7.5zm3 2.5h4.5a1.2 1.2 0 0 1 0 2.4H10.5v-2.4z"/>
+      </svg>
     </a>
     <a href="https://www.youtube.com/@HinariPenyo" target="_blank" class="hotkey-btn" title="히나리 페뇨 공식 유튜브 채널">
       <svg viewBox="0 0 24 24" class="youtube-icon-svg">
@@ -585,11 +716,33 @@
   <!-- 전체 수직 슬라이딩 트랙 -->
   <div class="slider-track" id="slider-track">
     
-    <!-- PAGE 1: 카운트다운 -->
+    <!-- PAGE 1: 카운트다운 뷰 -->
     <section class="section-view" id="sec-0">
       <h1 class="target-title">雛莉ぺにょ(히나리 페뇨)의 첫방송까지</h1>
-      <div class="timer-display" id="time-timer">00:00:00</div>
-      <div class="day-sub-display" id="day-sub">Day-0</div>
+      
+      <!-- 카운트다운 및 치지직 방송 입장 버튼 전환 컨테이너 -->
+      <div class="timer-container-wrapper">
+        
+        <!-- 카운트다운 타이머 박스 (00:00:00 시 페이드아웃 되며 사르르 종료) -->
+        <div class="timer-box-fade" id="timer-box">
+          <div class="timer-display" id="time-timer">00:00:00</div>
+          <div class="day-sub-display" id="day-sub">Day-0</div>
+        </div>
+
+        <!-- 00:00:00 직후 페이드인하여 등장하는 치지직 공식 방송국 입장 버튼 -->
+        <a href="https://chzzk.naver.com/f2607c885c65b6776b9cf5bfb473753c" target="_blank" class="chzzk-live-enter-btn" id="chzzk-live-btn" title="히나리 페뇨 공식 치지직 방송국으로 입장">
+          <svg viewBox="0 0 24 24" class="chzzk-btn-icon">
+            <path d="M4 3h16a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm3.5 4v10h3V13h2.5l2.5 4h3.5l-3.3-5.2A4 4 0 0 0 18 8.5C18 7.1 16.9 7 15.5 7H7.5zm3 2.5h4.5a1.2 1.2 0 0 1 0 2.4H10.5v-2.4z"/>
+          </svg>
+          <div class="chzzk-btn-text-group">
+            <div class="chzzk-btn-main-text">
+              <span class="live-dot-pulse"></span>LIVE STREAM
+            </div>
+            <div class="chzzk-btn-sub-text">치지직 공식 방송 보러가기 ➔</div>
+          </div>
+        </a>
+
+      </div>
 
       <div class="page1-bottom-bar" onclick="goToSection(1)" title="@HinariPenyo 게시물로 이동">
         <span class="page1-bottom-bar-text">@HinariPenyo</span>
@@ -704,13 +857,9 @@
     }
 
     // -------------------------------------------------------------
-    // 3D 회전목마 캐러셀 순환 회전 알고리즘 (최신 8/7일 트윗이 맨 처음 중앙 오도록 배치)
+    // N개 3D 회전목마 캐러셀 순환 회전 알고리즘
     // -------------------------------------------------------------
     const totalCardsCount = 4;
-    // card-0(8/7 최신): pos 1 (중앙)
-    // card-1(8/5): pos 2 (오른쪽)
-    // card-2(8/3): pos 3 (숨김)
-    // card-3(8/1): pos 0 (왼쪽)
     let currentPosMap = [1, 2, 3, 0]; 
 
     const cards = [
@@ -894,7 +1043,7 @@
     }, { passive: true });
 
     // -------------------------------------------------------------
-    // 카운트다운 타이머 로직 (Day-N 기준: 캘린더 '자정 00시' 날짜 차이 기준)
+    // 카운트다운 타이머 로직 & 00:00:00 페이드아웃 + 치지직 버튼 페이드인 로직
     // -------------------------------------------------------------
     const targetDate = new Date(2026, 7, 8, 20, 0, 0); // 2026년 8월 8일 20시 (목표 방송일)
     
@@ -902,6 +1051,11 @@
     const daySubEl = document.getElementById('day-sub');
     const miniTimeEl = document.getElementById('mini-time');
     const miniDayEl = document.getElementById('mini-day');
+
+    const timerBoxEl = document.getElementById('timer-box');
+    const chzzkLiveBtnEl = document.getElementById('chzzk-live-btn');
+
+    let isLiveStateTransitioned = false;
 
     function updateTimer() {
       const now = new Date();
@@ -916,11 +1070,20 @@
       // 정확한 남은 시간 (초 단위)
       const exactMsDiff = targetDate.getTime() - now.getTime();
 
+      // 00:00:00 방송 시작 시점 도달 처리
       if (exactMsDiff <= 0) {
         timeTimerEl.textContent = '00:00:00';
         daySubEl.textContent = 'Day-0';
-        miniTimeEl.textContent = '00:00:00';
+        miniTimeEl.textContent = 'LIVE NOW';
         miniDayEl.textContent = 'Day-0';
+
+        if (!isLiveStateTransitioned) {
+          isLiveStateTransitioned = true;
+          // 타이머 박스 사르르 페이드아웃 숨김
+          timerBoxEl.classList.add('hidden-fade');
+          // 치지직 입장 버튼 사르르 페이드인 등장
+          chzzkLiveBtnEl.classList.add('show-fade');
+        }
         return;
       }
 
@@ -934,7 +1097,6 @@
       const sStr = String(seconds).padStart(2, '0');
 
       const timeFormatted = `${totalHStr}:${mStr}:${sStr}`;
-      
       const dayFormatted = `Day-${calendarDaysDiff}`;
 
       timeTimerEl.textContent = timeFormatted;
